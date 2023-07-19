@@ -1,7 +1,10 @@
 .text1 {
     cursor: text;
     line-height:25px;
-    height: 25px;
+    height: 40px;
+    max-height: 40px;
+    overflow-x: auto;
+    overflow-y: hidden;
     text-align: center;
     background-color: green;
     color: white;
@@ -74,4 +77,8 @@ body {
     border-radius: 20px;
     background-color: #0d6efd;
     color: white;
+}
+
+#nonebutt{
+    display: none;
 }

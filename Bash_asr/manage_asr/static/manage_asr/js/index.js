@@ -307,44 +307,65 @@ function draw_div() {
         ctx.stroke();
         let tx = document.createElement("div");
         tx.classList.add("text1");
-        tx.setAttribute("ondblclick", "showInputField(this)");
-        tx.setAttribute("click", function (){
-            audio.currentTime =TEXT_CONTAINER[i].start;
-            audio.play();
-            console.log('начало',TEXT_CONTAINER[i].start,'конец',TEXT_CONTAINER[i].end);
-            timeout = setTimeout(function () {
-                audio.pause();
-            }, (TEXT_CONTAINER[i].end - TEXT_CONTAINER[i].start) * 1000);
-        });
+
+        tx.setAttribute("ondblclick", "makeEditable(this)");
+        tx.setAttribute("onblur", "saveContent("+i+")");
+        tx.setAttribute("oncontextmenu", "del(event,"+i+")");
+        tx.setAttribute("onclick", "evt_play(event,"+i+")");
         tx.setAttribute("data-index", i)
-        let textContent = TEXT_CONTAINER[i].text;
-        tx.innerHTML = TEXT_CONTAINER[i].text + '<input class="input-field"  type="text" onblur="saveText(this) " >';
+        tx.innerHTML = TEXT_CONTAINER[i].text;
         tx.style.width = (rect_x1 - rect_x0) + 'px';
         tx.style.left = (rect_x0 + left) + 'px';
         inner_div.append(tx);
     }
 }
 
+data_ind=document.getElementsByClassName("text1");
+
+function del(event,i) {
+    console.log(event);
+    console.log("i=",i);
+    event.preventDefault();
+    TEXT_CONTAINER.splice(i, 1);
+    draw_line();
+    draw_div();
+}
+
+function evt_play(event,i){
+    console.log("sfr=",event.button)
+    if(event.button === 0){
+        audio.currentTime =TEXT_CONTAINER[i].start;
+        audio.play();
+        console.log('начало',TEXT_CONTAINER[i].start,'конец',TEXT_CONTAINER[i].end);
+        timeout = setTimeout(function () {
+            audio.pause();
+        }, (TEXT_CONTAINER[i].end - TEXT_CONTAINER[i].start) * 1000);
+    }else if(event.button === 2){
+        TEXT_CONTAINER.splice(i, 1);
+
+        draw_div();
+    }
+
+}
+
 
 let indexdiv;
 
-function showInputField(element) {
-    var inputField = element.querySelector(".input-field");
-    indexdiv = parseInt(element.dataset.index);
-    inputField.value = element.textContent.trim();
-    element.innerHTML = '';
-    element.appendChild(inputField);
-    inputField.style.display = "block";
-    inputField.focus();
+var editableElement; // Глобальная переменная для хранения редактируемого элемента
+
+function makeEditable(element) {
+  element.contentEditable = true; // Делаем элемент редактируемым
+  editableElement = element; // Сохраняем элемент в глобальную переменную
 }
 
-function saveText(inputField) {
-    var text = inputField.value;
-    var divElement = inputField.parentNode;
-    divElement.innerHTML = text;
-    TEXT_CONTAINER[indexdiv].text = text;
-    divElement.appendChild(inputField);
-    inputField.style.display = "none";
+function saveContent(i) {
+    if (editableElement) {
+        var content = editableElement.innerText; // Получаем содержимое элемента
+        TEXT_CONTAINER[i].text = content;
+        console.log("Сохраненное содержимое:", content);
+        editableElement.contentEditable = false; // Отключаем режим редактирования
+        editableElement = null; // Сбрасываем глобальную переменную
+    }
 }
 
 
@@ -415,8 +436,10 @@ function minus() {
 
 function plus() {
     scale += 0.20;
-    if (scale > 2)
-        scale = 2;
+    if (scale > 3){
+        scale = 3;
+    }
+
     long_sec = 1 / scale * 10;
     if(long_sec>duration){
         long_sec=duration;
