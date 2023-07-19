@@ -83,8 +83,6 @@ function draw_line() {
     ctx.stroke();
 }
 
-// Получаем ссылку на элемент canvas по его идентификатору
-
 
 let start_select_second = 0, end_select_second = 0, start1;
 var isDrawing = false; // Флаг, указывающий, происходит ли рисование
@@ -213,8 +211,6 @@ function up(evt) {
 
 
 var i = 0;
-var k=0;
-
 const left = 600;
 
 function update_text_container(start, end, text) {
@@ -303,11 +299,11 @@ function draw_div() {
         var rect_x1 = ((TEXT_CONTAINER[i].end - current_start_sec) * canvas.width) / long_sec;
 
         ctx.fillStyle = 'rgba(127, 255, 0, 0.2)';
-        ctx.fillRect(rect_x0, 0, rect_x1 - rect_x0, height_block);// todo вынеси 300 как константу
+        ctx.fillRect(rect_x0, 0, rect_x1 - rect_x0, height_block);
         ctx.stroke();
+
         let tx = document.createElement("div");
         tx.classList.add("text1");
-
         tx.setAttribute("ondblclick", "makeEditable(this)");
         tx.setAttribute("onblur", "saveContent("+i+")");
         tx.setAttribute("oncontextmenu", "del(event,"+i+")");
@@ -320,19 +316,17 @@ function draw_div() {
     }
 }
 
-data_ind=document.getElementsByClassName("text1");
 
+//удаление блока при нажатии правой кнопки мыши
 function del(event,i) {
-    console.log(event);
-    console.log("i=",i);
     event.preventDefault();
     TEXT_CONTAINER.splice(i, 1);
     draw_line();
     draw_div();
 }
 
+//прослушивание блока при нажатии на него левой кнопкой мыши
 function evt_play(event,i){
-    console.log("sfr=",event.button)
     if(event.button === 0){
         audio.currentTime =TEXT_CONTAINER[i].start;
         audio.play();
@@ -340,19 +334,11 @@ function evt_play(event,i){
         timeout = setTimeout(function () {
             audio.pause();
         }, (TEXT_CONTAINER[i].end - TEXT_CONTAINER[i].start) * 1000);
-    }else if(event.button === 2){
-        TEXT_CONTAINER.splice(i, 1);
-
-        draw_div();
     }
-
 }
 
-
-let indexdiv;
-
+//редактирование блока
 var editableElement; // Глобальная переменная для хранения редактируемого элемента
-
 function makeEditable(element) {
   element.contentEditable = true; // Делаем элемент редактируемым
   editableElement = element; // Сохраняем элемент в глобальную переменную
@@ -369,7 +355,6 @@ function saveContent(i) {
 }
 
 
-count = 0;
 
 function next() {
     var move_content_percent = 0.75;
@@ -382,18 +367,11 @@ function next() {
         shift = duration * one_sec_points - long_sec * one_sec_points - shift_canvas;
         shift_canvas += shift;
     }
-
     shift_canvas = parseInt(shift_canvas);
-
-    // for (i = 0; i < TEXT_CONTAINER.length; i++) {
-    //     TEXT_CONTAINER[i].start -= shift / 50;
-    //     TEXT_CONTAINER[i].end -= shift / 50;
-    // }
-
     draw_line();
     draw_div();
-
 }
+
 
 function back() {
     var move_content_percent = 0.75;
@@ -404,14 +382,6 @@ function back() {
     if (shift_canvas < 0) {
         shift_canvas = 0;
     }
-
-    // else {
-    //     for (i = 0; i < TEXT_CONTAINER.length; i++) {
-    //         TEXT_CONTAINER[i].start += shift / 50;
-    //         TEXT_CONTAINER[i].end += shift / 50;
-    //     }
-    // }
-
     shift_canvas = parseInt(shift_canvas);
     draw_line();
     draw_div();
@@ -425,7 +395,7 @@ function minus() {
         scale = 0.2;
     if(duration<10){
         scale=1;
-        long_sec=duration
+        long_sec=duration;
     }else{
         long_sec = 1 / scale * 10;
     }
@@ -450,6 +420,7 @@ function plus() {
     draw_div();
 }
 
+//функция кнопки прослушивания, кнопку спрятали
 function play() {
     // var audio = document.getElementById("audio");
     audio.currentTime =time_s;
@@ -462,8 +433,8 @@ function play() {
     }
 }
 
+//кнопка паузы
 var playPauseButton = document.getElementById('pause');
-
 function togglePlayPause() {
     if (audio.paused) {
         audio.play();
@@ -471,7 +442,10 @@ function togglePlayPause() {
         audio.pause();
     }
 }
+
+//отправка измененных данных на сервер AJAX
 function Save(event){
+    //статус
     if (event === 0) {
         status=1;
     } else if (event === 1) {

@@ -27,6 +27,8 @@ int_array = []
 input_file = ''
 text_content=[]
 filter_version=''
+
+
 def model_audio_list(uploadedFile):
     asr_model = audio_list()
     asr_model.name = uploadedFile.name
@@ -44,6 +46,7 @@ def model_version2(asr_model):
     model_version.save()
     return model_version
 
+
 def model_transcription2(arr_JSON, model_version):
     for i in range(len(arr_JSON)):
         model_transcription = audio_transcription()
@@ -55,7 +58,6 @@ def model_transcription2(arr_JSON, model_version):
 
 
 def model_transcription3(arr_JSON, model_version):
-    print("функция вызывается")
     for i in range(len(arr_JSON)):
         model_transcription = audio_transcription()
         model_transcription.version_id = model_version
@@ -227,6 +229,7 @@ def cut_audio(file):
         os.remove(f"{pth}\static\manage_asr\\audio_file\\cut{i}.wav")
         time += 30
     return words
+
 
 @csrf_exempt
 def save_content(request):
